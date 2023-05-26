@@ -8,8 +8,7 @@ using Core.Models;
 using Core.Repositories;
 using Microsoft.AspNetCore.Identity;
 using Core.Services;
-
-
+using Microsoft.EntityFrameworkCore;
 
 namespace DataAccess.Services
 {
@@ -45,32 +44,15 @@ namespace DataAccess.Services
             return new AuthenticationResult { IsAuthenticated = true, Token = token };
         }
 
+        // Implementeer de AuthenticateAsync methode
         public async Task<AuthenticationResult> AuthenticateAsync(AuthenticateRequest model)
         {
             User user = await _userRepository.GetUserByEmailAsync(model.Email);
-            if (user == null || !_passwordHasher.VerifyHashedPassword(user, user.PasswordHash, model.Password))
+            if (user == null || !_passwordHasher.VerifyHashedPassword(user, user.PasswordHash, model.Password).Equals(PasswordVerificationResult.Success))
             {
                 return new AuthenticationResult { IsAuthenticated = false };
             }
 
-            string token = GenerateJwtToken(user);
-
-            return new AuthenticationResult { IsAuthenticated = true, Token = token };
-        }
-
-
-        public async Task<AuthenticationResult> AuthenticateAsync(string email, string password)
-        {
-            User user = await _userRepository.GetUserByEmailAsync(email);
-
-            if (user == null || _passwordHasher.VerifyHashedPassword(user, user.PasswordHash, password) == PasswordVerificationResult.Failed)
-
-            {
-                // Incorrecte email of wachtwoord
-                return new AuthenticationResult { IsAuthenticated = false };
-            }
-
-            // Genereer JWT token voor de geauthenticeerde gebruiker
             string token = GenerateJwtToken(user);
 
             return new AuthenticationResult { IsAuthenticated = true, Token = token };

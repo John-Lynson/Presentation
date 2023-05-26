@@ -14,10 +14,10 @@ namespace Core.Services
     {
         Task<AuthenticationResult> RegisterAsync(User user, string password);
         Task<AuthenticationResult> LoginAsync(string email, string password);
-        Task<AuthenticationResult> AuthenticateAsync(string email, string password);
+        Task<AuthenticationResult> AuthenticateAsync(AuthenticateRequest model);
         bool VerifyToken(string token);
-        Task AuthenticateAsync(AuthenticateRequest model);
     }
+
 
     public class AuthenticationService : IAuthenticationService
     {
@@ -75,6 +75,11 @@ namespace Core.Services
             string token = GenerateJwtToken(user);
 
             return new AuthenticationResult { IsAuthenticated = true, Token = token };
+        }
+
+        public async Task<AuthenticationResult> AuthenticateAsync(AuthenticateRequest model)
+        {
+            return await AuthenticateAsync(model.Email, model.Password);
         }
 
         public bool VerifyToken(string token)
