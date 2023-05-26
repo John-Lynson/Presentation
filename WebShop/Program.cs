@@ -9,14 +9,17 @@ using WebShop.DataAccess.Extensions;
 var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddControllers();
+builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
 builder.Services.AddScoped<IOrderRepository, OrderRepository>();
-builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<IOrderService, OrderService>();
 builder.Services.AddScoped<IUserService, UserService>();
 
 var app = builder.Build();
+
+// eerst de repo en daarna de database
+// builder.Servives.AddSingleton<IMyRepository, MyRepository>();
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
