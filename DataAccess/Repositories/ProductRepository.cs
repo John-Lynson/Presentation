@@ -12,6 +12,7 @@ namespace DataAccess.Repositories
 {
     public class ProductRepository : IProductRepository
     {
+        // your DbContext
         private readonly ApplicationDbContext _context;
 
         public ProductRepository(ApplicationDbContext context)
@@ -22,18 +23,6 @@ namespace DataAccess.Repositories
         public async Task<IEnumerable<Product>> GetAllAsync()
         {
             return await _context.Products.ToListAsync();
-        }
-
-        public async Task<IEnumerable<Product>> GetProductsByCategoryAsync(string category)
-        {
-            return await _context.Products
-                .Where(p => p.Category == category)
-                .ToListAsync();
-        }
-
-        public async Task<Product> GetAsync(int id)
-        {
-            return await _context.Products.FindAsync(id);
         }
 
         public async Task<Product> GetByIdAsync(int id)
@@ -57,6 +46,11 @@ namespace DataAccess.Repositories
         {
             _context.Products.Remove(product);
             await _context.SaveChangesAsync();
+        }
+
+        public async Task<IEnumerable<Product>> GetProductsByCategoryAsync(string category)
+        {
+            return await _context.Products.Where(p => p.Category == category).ToListAsync();
         }
     }
 }

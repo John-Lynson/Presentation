@@ -28,7 +28,7 @@ namespace DataAccess.Services
         public async Task<AuthenticationResult> RegisterAsync(User user, string password)
         {
             user.PasswordHash = _passwordHasher.HashPassword(user, password);
-            await _userRepository.AddUserAsync(user);
+            await _userRepository.CreateAsync(user);
             string token = GenerateJwtToken(user);
             return new AuthenticationResult { IsAuthenticated = true, Token = token };
         }

@@ -1,18 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using Core.Models;
+﻿using Core.Models;
+using Core.Repositories;
 
 namespace Core.Repositories
 {
-    public interface IProductRepository : IRepository<Product>
+    public interface IProductRepository
     {
+        Task<IEnumerable<Product>> GetAllAsync();
         Task<Product> GetByIdAsync(int id);
-        // Definieer hier andere methoden die je nodig hebt
+        Task CreateAsync(Product product); // make sure this method is in the interface
+        Task UpdateAsync(Product product);
+        Task DeleteAsync(Product product); // make sure this method is in the interface
         Task<IEnumerable<Product>> GetProductsByCategoryAsync(string category);
     }
 }

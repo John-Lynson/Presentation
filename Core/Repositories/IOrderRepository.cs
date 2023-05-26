@@ -9,10 +9,14 @@ using Core.Models;
 
 namespace Core.Repositories
 {
-    public interface IOrderRepository : IRepository<Order>
+    public interface IOrderRepository
     {
-        Task<Order> GetAsync(int id);
-        Task<IEnumerable<Order>> GetOrdersByUserIdAsync(int userId);
-        // Definieer hier andere methoden die je nodig hebt
+        Task<IEnumerable<Order>> GetAllAsync();
+        Task<Order> GetByIdAsync(int id);
+        Task CreateAsync(Order order);
+        Task UpdateAsync(Order order);
+        Task DeleteAsync(Order order);
+        Task<IEnumerable<Order>> GetOrdersByUserIdAsync(string userId);
     }
 }
+

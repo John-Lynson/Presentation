@@ -1,34 +1,62 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Core.Models;
+using Core.Repositories;
+using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
-using Core.Services;
-using Core.Models;
 
 namespace WebShop.Controllers
 {
-    [ApiController]
-    [Route("[controller]")]
-    public class UserController : ControllerBase
+    public class UserController : Controller
     {
-        private readonly IUserService _userService;
-        private readonly IAuthenticationService _authenticationService;
+        private readonly IUserRepository _userRepository;
 
-        public UserController(IUserService userService, IAuthenticationService authenticationService)
+        public UserController(IUserRepository userRepository)
         {
-            _userService = userService;
-            _authenticationService = authenticationService;
+            _userRepository = userRepository;
         }
 
-        [HttpPost("authenticate")]
-        public async Task<IActionResult> Authenticate(AuthenticateRequest model)
+        public async Task<IActionResult> Index()
         {
-            var response = await _authenticationService.AuthenticateAsync(model);
-
-            if (response == null)
-                return BadRequest(new { message = "Username or password is incorrect" });
-
-            return Ok(response);
+            var users = await _userRepository.GetAllAsync();
+            return View(users);
         }
 
-        // Implement other actions as needed
+        public async Task<IActionResult> Details(int id)
+        {
+            var user = await _userRepository.GetByIdAsync(id);
+            return View(user);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Create(User user)
+        {
+            if (ModelState.IsValid)
+            {
+                await _userRepository.CreateAsync(user);
+                return RedirectToAction(nameof(Index));
+            }
+            return View(user);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Edit(User user)
+        {
+            if (ModelState.IsValid)
+            {
+                await _userRepository.UpdateAsync(user);
+                return RedirectToAction(nameof(Index));
+            }
+            return View(user);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Delete(int id)
+        {
+            var user = await _userRepository.GetByIdAsync(id);
+            if (user != null)
+            {
+                await _userRepository.DeleteAsync(user);
+            }
+            return RedirectToAction(nameof(Index));
+        }
     }
 }

@@ -5,6 +5,9 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
+using Pomelo.EntityFrameworkCore.MySql.Infrastructure;
+
+
 
 namespace DataAccess
 {
@@ -13,7 +16,11 @@ namespace DataAccess
         public ApplicationDbContext CreateDbContext(string[] args)
         {
             var optionsBuilder = new DbContextOptionsBuilder<ApplicationDbContext>();
-            optionsBuilder.UseSqlServer("Server=(localdb)\\mssqllocaldb;Database=WebShopDb;Trusted_Connection=True;MultipleActiveResultSets=true");
+            optionsBuilder.UseMySql(
+                "Server=studmysql01.fhict.local;Database=dbi511796;User=dbi511796;Password=WebDb2023;",
+                new MySqlServerVersion(new Version(5, 7, 26)), // gebruik de juiste versie van jouw MySQL server
+                mySqlOptions => mySqlOptions
+                    .CharSetBehavior(CharSetBehavior.NeverAppend));
 
             return new ApplicationDbContext(optionsBuilder.Options);
         }

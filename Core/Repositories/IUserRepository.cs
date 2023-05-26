@@ -1,16 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Threading.Tasks;
 using Core.Models;
 
 namespace Core.Repositories
 {
-    public interface IUserRepository : IRepository<User>
+    public interface IUserRepository
     {
+        Task<IEnumerable<User>> GetAllAsync();
+        Task<User> GetByIdAsync(int id);
+        Task CreateAsync(User user); // renamed from AddUserAsync
+        Task UpdateAsync(User user);
+        Task DeleteAsync(User user); // renamed from RemoveAsync
         Task<User> GetUserByEmailAsync(string email);
-        Task AddUserAsync(User user);
     }
 }

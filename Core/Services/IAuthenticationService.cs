@@ -38,7 +38,7 @@ namespace Core.Services
             user.PasswordHash = _passwordHasher.HashPassword(user, password);
 
             // Gebruiker toevoegen aan repository
-            await _userRepository.AddUserAsync(user);
+            await _userRepository.CreateAsync(user);
 
             // Genereer JWT token voor de nieuwe gebruiker
             string token = GenerateJwtToken(user);

@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Core.Models;
@@ -20,31 +21,22 @@ namespace DataAccess.Repositories
             return await _context.Orders.ToListAsync();
         }
 
-        public async Task<Order> GetAsync(int id)
-        {
-            return await _context.Orders.FindAsync(id);
-        }
-
-        public async Task<IEnumerable<Order>> GetOrdersByUserIdAsync(int userId)
-        {
-            return await _context.Orders
-                .Where(o => o.User.Id == userId.ToString())
-                .ToListAsync();
-        }
-
-
         public async Task<Order> GetByIdAsync(int id)
         {
             var order = await _context.Orders.FindAsync(id);
             if (order == null)
             {
-                throw new Exception($"No order found with ID {id}.");
+                throw new ArgumentException($"Order with id {id} not found.");
             }
-
             return order;
         }
 
-
+        public async Task<IEnumerable<Order>> GetOrdersByUserIdAsync(string userId)
+        {
+            return await _context.Orders
+                .Where(o => o.User.Id == userId)
+                .ToListAsync();
+        }
 
         public async Task CreateAsync(Order order)
         {
@@ -62,13 +54,6 @@ namespace DataAccess.Repositories
         {
             _context.Orders.Remove(order);
             await _context.SaveChangesAsync();
-        }
-
-        public async Task<IEnumerable<Order>> GetOrdersByUserIdAsync(string userId)
-        {
-            return await _context.Orders
-                .Where(o => o.User.Id == userId)
-                .ToListAsync();
         }
     }
 }
