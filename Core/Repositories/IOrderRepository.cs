@@ -11,12 +11,12 @@ namespace Core.Repositories
 {
     public interface IOrderRepository
     {
+        Task CreateAsync(Order order);
+        Task DeleteAsync(Order order);
         Task<IEnumerable<Order>> GetAllAsync();
         Task<Order> GetByIdAsync(int id);
-        Task CreateAsync(Order order);
+        Task<IEnumerable<Order>> GetOrdersByUserIdAsync(int userId);
         Task UpdateAsync(Order order);
-        Task DeleteAsync(Order order);
-        Task<IEnumerable<Order>> GetOrdersByUserIdAsync(string userId);
     }
 }
 

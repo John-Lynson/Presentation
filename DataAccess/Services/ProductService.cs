@@ -45,6 +45,11 @@ namespace DataAccess.Services
             await _productRepository.DeleteAsync(product);
         }
 
+        public async Task<Product> GetProductByIdAsync(int id)
+        {
+            return await _productRepository.GetByIdAsync(id);
+        }
+
         public async Task<IEnumerable<Product>> GetProductsByCategoryAsync(string category)
         {
             return await _productRepository.GetProductsByCategoryAsync(category);

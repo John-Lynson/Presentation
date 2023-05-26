@@ -31,12 +31,14 @@ namespace DataAccess.Repositories
             return order;
         }
 
-        public async Task<IEnumerable<Order>> GetOrdersByUserIdAsync(string userId)
+        public async Task<IEnumerable<Order>> GetOrdersByUserIdAsync(int userId)
         {
+            var userIdString = userId.ToString();
             return await _context.Orders
-                .Where(o => o.User.Id == userId)
+                .Where(o => o.UserId == userIdString)
                 .ToListAsync();
         }
+
 
         public async Task CreateAsync(Order order)
         {
