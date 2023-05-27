@@ -8,7 +8,7 @@ namespace Core.Repositories
     public interface IUserRepository
     {
         Task<IEnumerable<User>> GetAllAsync();
-        Task<User> GetByIdAsync(int id);
+        Task<User> GetByIdAsync(string id); // Changed int to string
         Task CreateAsync(User user); // renamed from AddUserAsync
         Task UpdateAsync(User user);
         Task DeleteAsync(User user); // renamed from RemoveAsync

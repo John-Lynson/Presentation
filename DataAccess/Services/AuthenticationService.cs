@@ -44,7 +44,6 @@ namespace DataAccess.Services
             return new AuthenticationResult { IsAuthenticated = true, Token = token };
         }
 
-        // Implementeer de AuthenticateAsync methode
         public async Task<AuthenticationResult> AuthenticateAsync(AuthenticateRequest model)
         {
             User user = await _userRepository.GetUserByEmailAsync(model.Email);
@@ -58,10 +57,34 @@ namespace DataAccess.Services
             return new AuthenticationResult { IsAuthenticated = true, Token = token };
         }
 
-        public bool VerifyToken(string token)
+        public async Task<bool> VerifyTokenAsync(string token)
         {
-            // TODO: Implementeer de logica om het token te verifiëren
-            throw new NotImplementedException();
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var key = Encoding.ASCII.GetBytes(_jwtKey);
+
+            try
+            {
+                tokenHandler.ValidateToken(token, new TokenValidationParameters
+                {
+                    ValidateIssuerSigningKey = true,
+                    IssuerSigningKey = new SymmetricSecurityKey(key),
+                    ValidateIssuer = false,
+                    ValidateAudience = false
+                }, out SecurityToken validatedToken);
+
+                var jwtToken = (JwtSecurityToken)validatedToken;
+
+                if (jwtToken.ValidTo < DateTime.UtcNow)
+                {
+                    return false;
+                }
+
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
         }
 
         private string GenerateJwtToken(User user)

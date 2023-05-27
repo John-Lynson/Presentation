@@ -4,7 +4,9 @@ using DataAccess;
 using DataAccess.Repositories;
 using DataAccess.Services;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using WebShop.DataAccess.Extensions;
+using System;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -25,6 +27,24 @@ builder.Services.AddScoped<IOrderService, OrderService>();
 builder.Services.AddScoped<IUserService, UserService>();
 
 var app = builder.Build();
+
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    try
+    {
+        var context = services.GetRequiredService<ApplicationDbContext>();
+        if (!context.Database.CanConnect())
+        {
+            throw new Exception("Cannot connect to the database. Please check your connection string and database server.");
+        }
+    }
+    catch (Exception ex)
+    {
+        Console.Error.WriteLine(ex.Message);
+        Environment.Exit(-1);
+    }
+}
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())

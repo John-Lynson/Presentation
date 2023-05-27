@@ -20,7 +20,7 @@ namespace Core.Services
             _userRepository = userRepository;
         }
 
-        public async Task<User> GetUserByIdAsync(int id)
+        public async Task<User> GetUserByIdAsync(string id)
         {
             return await _userRepository.GetByIdAsync(id);
         }
@@ -42,7 +42,7 @@ namespace Core.Services
             return true;
         }
 
-        public async Task<bool> DeleteUserAsync(int id)
+        public async Task<bool> DeleteUserAsync(string id)
         {
             var user = await _userRepository.GetByIdAsync(id);
             if (user == null) return false;

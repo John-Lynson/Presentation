@@ -1,10 +1,9 @@
-﻿using Xunit;
-using Moq;
-using Core.Models;
-using Core.Services;
-using System.Threading.Tasks;
+﻿using Core.Models;
 using Core.Repositories;
 using DataAccess.Services;
+using Core.Services;
+using System.Threading.Tasks;
+using Moq;
 
 public class OrderServiceTests
 {
@@ -13,7 +12,7 @@ public class OrderServiceTests
     {
         // Arrange
         var mockRepo = new Mock<IOrderRepository>();
-        var testOrder = new Order { Id = 1, UserId = 1, OrderDate = DateTime.Now };
+        var testOrder = new Order { Id = 1, UserId = "1", OrderDate = DateTime.Now }; // UserId is now a string
         mockRepo.Setup(repo => repo.GetByIdAsync(1)).ReturnsAsync(testOrder);
 
         var orderService = new OrderService(mockRepo.Object);

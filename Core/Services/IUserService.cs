@@ -11,10 +11,10 @@ namespace Core.Services
 {
     public interface IUserService
     {
-        Task<User> GetUserByIdAsync(int id);
+        Task<User> GetUserByIdAsync(string id);
         Task<IEnumerable<User>> GetAllUsersAsync();
         Task<bool> CreateUserAsync(User user);
         Task<bool> UpdateUserAsync(User user);
-        Task<bool> DeleteUserAsync(int id);
+        Task<bool> DeleteUserAsync(string id); // Veranderd van int naar string voor consistentie
     }
 }

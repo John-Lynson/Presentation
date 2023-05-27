@@ -20,7 +20,7 @@ namespace WebShop.Controllers
             return View(users);
         }
 
-        public async Task<IActionResult> Details(int id)
+        public async Task<IActionResult> Details(string id)
         {
             var user = await _userRepository.GetByIdAsync(id);
             return View(user);
@@ -49,7 +49,7 @@ namespace WebShop.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Delete(int id)
+        public async Task<IActionResult> Delete(string id)
         {
             var user = await _userRepository.GetByIdAsync(id);
             if (user != null)

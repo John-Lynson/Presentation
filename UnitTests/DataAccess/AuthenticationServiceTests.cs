@@ -27,7 +27,7 @@ namespace UnitTests
             // Arrange
             var user = new User { Email = "test@test.com" };
             var password = "testPassword";
-            _mockUserRepo.Setup(repo => repo.AddUserAsync(user)).Returns(Task.CompletedTask);
+            _mockUserRepo.Setup(repo => repo.CreateAsync(user)).Returns(Task.CompletedTask);
             _mockPasswordHasher.Setup(hasher => hasher.HashPassword(user, password)).Returns("hashedPassword");
 
             // Act
