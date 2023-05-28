@@ -10,8 +10,6 @@ using DataAccess.Services;
 using Core.Repositories;
 using Core.Services;
 
-
-
 namespace WebShop
 {
     public class Startup
@@ -51,33 +49,7 @@ namespace WebShop
             services.AddRazorPages();
         }
 
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, ApplicationDbContext ApplicationDbContext)
-        {
-            // ...
-
-            // Test de databaseverbinding
-            try
-            {
-                ApplicationDbContext.Database.EnsureCreated(); // Optioneel: zorgt ervoor dat de database wordt aangemaakt als deze nog niet bestaat
-                if (ApplicationDbContext.Database.CanConnect())
-                {
-                    Console.WriteLine("Database connection successful.");
-                }
-                else
-                {
-                    Console.WriteLine("Cannot connect to the database. Please check your connection string and database server.");
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine("Exception: " + ex.ToString());
-            }
-
-        // ...
-    }
-
-
-    public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             if (env.IsDevelopment())
             {
