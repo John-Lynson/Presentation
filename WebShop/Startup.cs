@@ -1,86 +1,109 @@
-﻿using Core.Repositories;
-using Core.Services;
-using Presentation.Configuration;
+﻿using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using DataAccess;
 using DataAccess.Repositories;
 using DataAccess.Services;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Options;
-using WebShop.DataAccess.Extensions;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using System.Text;
-using Microsoft.Extensions.Configuration;
-using Microsoft.IdentityModel.Tokens;
-using System;
+using Core.Repositories;
+using Core.Services;
 
 
-public class Startup
+
+namespace WebShop
 {
-    public IConfiguration Configuration { get; }
-
-    public Startup(IConfiguration configuration)
+    public class Startup
     {
-        Configuration = configuration;
-    }
+        public IConfiguration Configuration { get; }
 
-    public void ConfigureServices(IServiceCollection services)
-    {
-        // Voeg DbContext toe voor het werken met de database
-        services.AddDbContext<ApplicationDbContext>(options =>
-            options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
-
-        // Registreer repositories
-        services.AddScoped<IProductRepository, ProductRepository>();
-        services.AddScoped<IOrderRepository, OrderRepository>();
-        services.AddScoped<IUserRepository, UserRepository>();
-
-        // Registreer services
-        services.AddScoped<IProductService, ProductService>();
-        services.AddScoped<IOrderService, OrderService>();
-        services.AddScoped<IUserService, UserService>();
-        services.AddScoped<IPasswordHasher, PasswordHasher>();
-        services.AddScoped<IAuthenticationService, AuthenticationService>();
-
-        // Registreer de authenticatie gerelateerde services en configuratie
-        var authenticationSettings = Configuration.GetSection("AuthenticationSettings").Get<AuthenticationSettings>();
-        services.Configure<AuthenticationSettings>(Configuration.GetSection("AuthenticationSettings"));
-
-        services.AddAuthentication(options =>
+        public Startup(IConfiguration configuration)
         {
-            options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-            options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-        })
-            .AddJwtBearer(options =>
-            {
-                options.RequireHttpsMetadata = false;
-                options.SaveToken = true;
-                options.TokenValidationParameters = new TokenValidationParameters
+            Configuration = configuration;
+        }
+
+        public void ConfigureServices(IServiceCollection services)
+        {
+            // Add DbContext
+            services.AddDbContext<ApplicationDbContext>();
+
+            // Add repositories
+            services.AddScoped<IUserRepository, UserRepository>();
+            services.AddScoped<IProductRepository, ProductRepository>();
+            services.AddScoped<IOrderRepository, OrderRepository>();
+
+            // Add services
+            services.AddScoped<IUserService, UserService>();
+            services.AddScoped<IProductService, ProductService>();
+            services.AddScoped<IOrderService, OrderService>();
+
+            services.AddControllersWithViews();
+
+            // Authentication
+            services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+                .AddCookie(options =>
                 {
-                    ValidateIssuer = true,
-                    ValidateAudience = true,
-                    ValidateIssuerSigningKey = true,
-                    ValidIssuer = authenticationSettings.Issuer,
-                    ValidAudience = authenticationSettings.Audience,
-                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(authenticationSettings.SecretKey))
-                };
-            });
+                    options.LoginPath = "/Account/Login";
+                    options.AccessDeniedPath = "/Account/AccessDenied";
+                });
 
-        // Voeg controllers en views toe
-        services.AddControllersWithViews();
+            services.AddRazorPages();
+        }
+
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, ApplicationDbContext ApplicationDbContext)
+        {
+            // ...
+
+            // Test de databaseverbinding
+            try
+            {
+                ApplicationDbContext.Database.EnsureCreated(); // Optioneel: zorgt ervoor dat de database wordt aangemaakt als deze nog niet bestaat
+                if (ApplicationDbContext.Database.CanConnect())
+                {
+                    Console.WriteLine("Database connection successful.");
+                }
+                else
+                {
+                    Console.WriteLine("Cannot connect to the database. Please check your connection string and database server.");
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Exception: " + ex.ToString());
+            }
+
+        // ...
     }
 
-    public void Configure(IApplicationBuilder app)
-    {
-        // Voeg middleware toe aan de HTTP-pipeline
-        app.UseRouting();
 
-        app.UseAuthentication();
-        app.UseAuthorization();
-
-        app.UseEndpoints(endpoints =>
+    public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            endpoints.MapControllers();
-        });
+            if (env.IsDevelopment())
+            {
+                app.UseDeveloperExceptionPage();
+            }
+            else
+            {
+                app.UseExceptionHandler("/Home/Error");
+                app.UseHsts();
+            }
+
+            app.UseHttpsRedirection();
+            app.UseStaticFiles();
+
+            app.UseRouting();
+
+            app.UseAuthentication();
+            app.UseAuthorization();
+
+            app.UseEndpoints(endpoints =>
+            {
+                endpoints.MapControllerRoute(
+                    name: "default",
+                    pattern: "{controller=Home}/{action=Index}/{id?}");
+                endpoints.MapRazorPages();
+            });
+        }
     }
 }

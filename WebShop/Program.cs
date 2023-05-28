@@ -3,10 +3,13 @@ using Core.Services;
 using DataAccess;
 using DataAccess.Repositories;
 using DataAccess.Services;
-using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using WebShop.DataAccess.Extensions;
-using System;
+using Microsoft.Extensions.Hosting;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -15,10 +18,9 @@ var connectionString = builder.Configuration.GetConnectionString("DefaultConnect
 
 // Register ApplicationDbContext in the DI container.
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)));
+    options.UseSqlServer(connectionString));
 
 // Add services to the container.
-builder.Services.AddControllers();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
 builder.Services.AddScoped<IOrderRepository, OrderRepository>();
@@ -26,22 +28,22 @@ builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<IOrderService, OrderService>();
 builder.Services.AddScoped<IUserService, UserService>();
 
+builder.Services.AddControllers();
+
 var app = builder.Build();
 
+// Test Database Connection
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
     try
     {
         var context = services.GetRequiredService<ApplicationDbContext>();
-        if (!context.Database.CanConnect())
-        {
-            throw new Exception("Cannot connect to the database. Please check your connection string and database server.");
-        }
+        context.Database.EnsureCreated();
     }
     catch (Exception ex)
     {
-        Console.Error.WriteLine(ex.Message);
+        Console.Error.WriteLine("Exception: " + ex.ToString());
         Environment.Exit(-1);
     }
 }

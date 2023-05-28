@@ -1,12 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Core.Models;
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using Pomelo.EntityFrameworkCore.MySql.Infrastructure;
+using Core.Models;
+using Microsoft.AspNetCore.Identity;
 
 namespace DataAccess
 {
@@ -20,15 +15,24 @@ namespace DataAccess
         public DbSet<Product> Products { get; set; }
         public DbSet<Order> Orders { get; set; }
         public DbSet<OrderItem> OrderItems { get; set; }
+        public DbSet<User> Users { get; set; } // Voeg deze regel toe
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
 
-            // Setting the charset for all entities
-            modelBuilder.HasCharSet(CharSet.Utf8Mb4, DelegationModes.ApplyToColumns);
+            modelBuilder.Entity<Product>()
+                .Property(p => p.Price)
+                .HasColumnType("decimal(18, 2)")
+                .HasPrecision(18, 2);
 
-            // We could add additional configuration here
+            modelBuilder.Entity<IdentityUserLogin<string>>()
+                .Ignore(l => l.UserId)
+                .HasKey(l => new { l.LoginProvider, l.ProviderKey });
+
+            // Voeg hier eventuele andere configuraties toe
+
+            //...
         }
     }
 }

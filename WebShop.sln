@@ -12,7 +12,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DataAccess", "DataAccess\Da
 		{84EDC271-0BD7-4D43-9C08-CD9F531F7DC7} = {84EDC271-0BD7-4D43-9C08-CD9F531F7DC7}
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnitTests", "UnitTests\UnitTests.csproj", "{3C2A4AA1-50D8-41ED-8222-CE46C76C6CD8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UnitTests", "UnitTests\UnitTests.csproj", "{3C2A4AA1-50D8-41ED-8222-CE46C76C6CD8}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
