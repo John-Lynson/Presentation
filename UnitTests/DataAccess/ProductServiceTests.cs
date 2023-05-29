@@ -13,7 +13,7 @@ public class ProductServiceTests
     {
         // Arrange
         var mockRepo = new Mock<IProductRepository>();
-        var testProduct = new Product { Id = 1, FirstName = "Test Product" };
+        var testProduct = new Product { Id = 1, Name = "Test Product" };
         mockRepo.Setup(repo => repo.GetByIdAsync(1)).ReturnsAsync(testProduct);
 
         var productService = new ProductService(mockRepo.Object);

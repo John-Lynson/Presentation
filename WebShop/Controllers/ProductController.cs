@@ -1,5 +1,5 @@
 ﻿using Core.Models;
-using Core.Repositories;
+using Core.Services; 
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
 
@@ -7,23 +7,22 @@ namespace WebShop.Controllers
 {
     public class ProductController : Controller
     {
-        private readonly IProductRepository _productRepository;
+        private readonly IProductService _productService; 
 
-        public ProductController(IProductRepository productRepository)
+        public ProductController(IProductService productService)
         {
-            _productRepository = productRepository;
+            _productService = productService;
         }
-
 
         public async Task<IActionResult> Index()
         {
-            var products = await _productRepository.GetAllAsync();
+            var products = await _productService.GetAllAsync();
             return View(products);
         }
 
         public async Task<IActionResult> Details(int id)
         {
-            var product = await _productRepository.GetByIdAsync(id);
+            var product = await _productService.GetByIdAsync(id);
             return View(product);
         }
 
@@ -32,7 +31,7 @@ namespace WebShop.Controllers
         {
             if (ModelState.IsValid)
             {
-                await _productRepository.CreateAsync(product);
+                await _productService.CreateAsync(product);
                 return RedirectToAction(nameof(Index));
             }
             return View(product);
@@ -43,7 +42,7 @@ namespace WebShop.Controllers
         {
             if (ModelState.IsValid)
             {
-                await _productRepository.UpdateAsync(product);
+                await _productService.UpdateAsync(product);
                 return RedirectToAction(nameof(Index));
             }
             return View(product);
@@ -52,13 +51,13 @@ namespace WebShop.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteProduct(int id)
         {
-            var product = await _productRepository.GetByIdAsync(id);
+            var product = await _productService.GetByIdAsync(id);
             if (product == null)
             {
                 return NotFound();
             }
 
-            await _productRepository.DeleteAsync(product);  // Hier moet een Product-object worden doorgegeven.
+            await _productService.DeleteAsync(product);  // Hier moet een Product-object worden doorgegeven.
             return NoContent();
         }
     }

@@ -15,7 +15,6 @@ namespace DataAccess
         public DbSet<Product> Products { get; set; }
         public DbSet<Order> Orders { get; set; }
         public DbSet<OrderItem> OrderItems { get; set; }
-        public DbSet<User> Users { get; set; } // Voeg deze regel toe
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
