@@ -12,12 +12,16 @@ namespace DataAccess.Repositories
 {
     public class ProductRepository : IProductRepository
     {
-        // your DbContext
         private readonly ApplicationDbContext _context;
 
         public ProductRepository(ApplicationDbContext context)
         {
             _context = context;
+        }
+
+        public async Task<Product> GetProductAsync(int productId)
+        {
+            return await _context.Products.FindAsync(productId);
         }
 
         public async Task<IEnumerable<Product>> GetAllAsync()

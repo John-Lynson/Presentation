@@ -22,8 +22,7 @@ namespace UnitTests
         [Fact]
         public async Task CreateOrderAsync_ShouldReturnTrue_WhenOrderIsAddedSuccessfully()
         {
-            // Arrange
-            var order = new Order { Id = 1 };
+            var order = new Order.Builder().WithId(1).Build();
             _mockOrderRepo.Setup(repo => repo.CreateAsync(order)).Returns(Task.CompletedTask);
 
             // Act

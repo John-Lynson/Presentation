@@ -1,46 +1,57 @@
 ﻿using Core.Models;
 using Core.Repositories;
+using Core.Services;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
-namespace Core.Services
+namespace DataAccess.Services
 {
     public class CartService : ICartService
     {
         private readonly ICartRepository _cartRepository;
+        private readonly IProductRepository _productRepository;
 
-        public CartService(ICartRepository cartRepository)
+        public CartService(ICartRepository cartRepository, IProductRepository productRepository)
         {
             _cartRepository = cartRepository;
+            _productRepository = productRepository;
         }
 
         public async Task AddItemAsync(string cartId, Product product, int quantity)
         {
-            var cart = await _cartRepository.GetCartAsync(cartId) ?? new Cart { CartId = cartId };
+            // Get the cart from the repository
+            var cart = await _cartRepository.GetCartAsync(cartId);
 
-            cart.AddItem(product, quantity);
-
-            if (cart.CartId == null)
+            // If the cart does not exist, create a new one
+            if (cart == null)
             {
+                cart = new Cart { CartId = cartId };
                 await _cartRepository.CreateAsync(cart);
             }
-            else
-            {
-                await _cartRepository.UpdateAsync(cart);
-            }
+
+            // Add the item to the cart
+            cart.AddItem(product, quantity);
+
+            // Update the cart in the repository
+            await _cartRepository.UpdateAsync(cart);
         }
 
         public async Task RemoveItemAsync(string cartId, Product product)
         {
+            // Get the cart from the repository
             var cart = await _cartRepository.GetCartAsync(cartId);
-            if (cart != null)
+
+            // If the cart does not exist, then there's nothing to remove
+            if (cart == null)
             {
-                cart.RemoveItem(product);
-                await _cartRepository.UpdateAsync(cart);
+                return;
             }
+
+            // Remove the item from the cart
+            cart.RemoveItem(product);
+
+            // Update the cart in the repository
+            await _cartRepository.UpdateAsync(cart);
         }
 
         public async Task<Cart> GetCartAsync(string cartId)
