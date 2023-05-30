@@ -1,26 +1,39 @@
-﻿using Core.Models;
+﻿using Xunit;
+using Moq;
+using Core.Models;
 using Core.Repositories;
-using DataAccess.Services;
 using Core.Services;
 using System.Threading.Tasks;
-using Moq;
+using DataAccess.Services;
 
-public class OrderServiceTests
+namespace UnitTests
 {
-    [Fact]
-    public async Task GetOrderByIdAsync_ReturnsExpectedOrder()
+    public class OrderServiceTests
     {
-        // Arrange
-        var mockRepo = new Mock<IOrderRepository>();
-        var testOrder = new Order { Id = 1, UserId = "1", OrderDate = DateTime.Now }; // UserId is now a string
-        mockRepo.Setup(repo => repo.GetByIdAsync(1)).ReturnsAsync(testOrder);
+        private readonly OrderService _orderService;
+        private readonly Mock<IOrderRepository> _mockOrderRepo;
 
-        var orderService = new OrderService(mockRepo.Object);
+        public OrderServiceTests()
+        {
+            _mockOrderRepo = new Mock<IOrderRepository>();
+            _orderService = new OrderService(_mockOrderRepo.Object);
+        }
 
-        // Act
-        var result = await orderService.GetOrderByIdAsync(1);
+        [Fact]
+        public async Task CreateOrderAsync_ShouldReturnTrue_WhenOrderIsAddedSuccessfully()
+        {
+            // Arrange
+            var order = new Order { Id = 1 };
+            _mockOrderRepo.Setup(repo => repo.CreateAsync(order)).Returns(Task.CompletedTask);
 
-        // Assert
-        Assert.Equal(testOrder, result);
+            // Act
+            var result = await _orderService.CreateOrderAsync(order);
+
+            // Assert
+            Assert.True(result);
+            _mockOrderRepo.Verify(repo => repo.CreateAsync(order), Times.Once);
+        }
+
+        // ... voeg hier je andere tests toe ...
     }
 }

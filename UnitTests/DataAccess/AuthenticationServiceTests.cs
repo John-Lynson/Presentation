@@ -36,19 +36,24 @@ namespace UnitTests
             // Assert
             Assert.True(result.IsAuthenticated);
             Assert.NotNull(result.Token);
+            _mockUserRepo.Verify(repo => repo.CreateAsync(user), Times.Once);
+            _mockPasswordHasher.Verify(hasher => hasher.HashPassword(user, password), Times.Once);
         }
 
         [Fact]
         public async Task LoginAsync_ShouldReturnNotAuthenticated_WhenUserDoesNotExist()
         {
             // Arrange
+            var email = "nonexistent@test.com";
+            var password = "testPassword";
             _mockUserRepo.Setup(repo => repo.GetUserByEmailAsync(It.IsAny<string>())).Returns(Task.FromResult<User>(null));
 
             // Act
-            var result = await _authService.LoginAsync("nonexistent@test.com", "testPassword");
+            var result = await _authService.LoginAsync(email, password);
 
             // Assert
             Assert.False(result.IsAuthenticated);
+            _mockUserRepo.Verify(repo => repo.GetUserByEmailAsync(It.IsAny<string>()), Times.Once);
         }
 
         [Fact]
@@ -56,17 +61,36 @@ namespace UnitTests
         {
             // Arrange
             var user = new User { Email = "test@test.com", PasswordHash = "hashedPassword" };
+            var password = "testPassword";
             _mockUserRepo.Setup(repo => repo.GetUserByEmailAsync(user.Email)).Returns(Task.FromResult(user));
-            _mockPasswordHasher.Setup(hasher => hasher.VerifyHashedPassword(user, user.PasswordHash, "testPassword")).Returns(PasswordVerificationResult.Success);
+            _mockPasswordHasher.Setup(hasher => hasher.VerifyHashedPassword(user, user.PasswordHash, password)).Returns(PasswordVerificationResult.Success);
 
             // Act
-            var result = await _authService.LoginAsync(user.Email, "testPassword");
+            var result = await _authService.LoginAsync(user.Email, password);
 
             // Assert
             Assert.True(result.IsAuthenticated);
             Assert.NotNull(result.Token);
+            _mockUserRepo.Verify(repo => repo.GetUserByEmailAsync(user.Email), Times.Once);
+            _mockPasswordHasher.Verify(hasher => hasher.VerifyHashedPassword(user, user.PasswordHash, password), Times.Once);
         }
 
-        // Implementeer soortgelijke tests voor AuthenticateAsync methode...
+        [Fact]
+            public async Task AuthenticateAsync_ShouldReturnAuthenticated_WhenUserCredentialsAreCorrect()
+        {
+            // Arrange
+            var user = new User { Email = "test@test.com", PasswordHash = "hashedPassword" };
+            var authRequest = new AuthenticateRequest(user.Email, "testPassword");
+            _mockUserRepo.Setup(repo => repo.GetUserByEmailAsync(user.Email)).Returns(Task.FromResult(user));
+            _mockPasswordHasher.Setup(hasher => hasher.VerifyHashedPassword(user, user.PasswordHash, "testPassword")).Returns(PasswordVerificationResult.Success);
+
+            // Act
+            var result = await _authService.AuthenticateAsync(authRequest);
+
+            // Assert
+            Assert.True(result.IsAuthenticated);
+            Assert.NotNull(result.Token);
+            _mockUserRepo.Verify(repo => repo.GetUserByEmailAsync(user.Email), Times.Once);
+        }
     }
 }
