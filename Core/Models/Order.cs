@@ -16,7 +16,13 @@ namespace Core.Models
         public DateTime OrderDate { get; private set; }
         public List<OrderItem> OrderItems { get; private set; }
 
-        private Order() { }
+        private Order()
+        {
+            UserId = string.Empty;
+            User = null!;
+            OrderDate = DateTime.MinValue;
+            OrderItems = new List<OrderItem>();
+        }
 
         public class Builder
         {

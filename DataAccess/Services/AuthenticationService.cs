@@ -36,7 +36,7 @@ namespace DataAccess.Services
         public async Task<AuthenticationResult> LoginAsync(string email, string password)
         {
             User user = await _userRepository.GetUserByEmailAsync(email);
-            if (user == null || !_passwordHasher.VerifyHashedPassword(user, user.PasswordHash, password).Equals(PasswordVerificationResult.Success))
+            if (user == null || string.IsNullOrEmpty(user.PasswordHash) || !_passwordHasher.VerifyHashedPassword(user, user.PasswordHash, password).Equals(PasswordVerificationResult.Success))
             {
                 return new AuthenticationResult { IsAuthenticated = false };
             }
@@ -47,7 +47,7 @@ namespace DataAccess.Services
         public async Task<AuthenticationResult> AuthenticateAsync(AuthenticateRequest model)
         {
             User user = await _userRepository.GetUserByEmailAsync(model.Email);
-            if (user == null || !_passwordHasher.VerifyHashedPassword(user, user.PasswordHash, model.Password).Equals(PasswordVerificationResult.Success))
+            if (user == null || string.IsNullOrEmpty(user.PasswordHash) || !_passwordHasher.VerifyHashedPassword(user, user.PasswordHash, model.Password).Equals(PasswordVerificationResult.Success))
             {
                 return new AuthenticationResult { IsAuthenticated = false };
             }
@@ -76,28 +76,34 @@ namespace DataAccess.Services
 
                 if (jwtToken.ValidTo < DateTime.UtcNow)
                 {
-                    return false;
+                    return await Task.FromResult(false);
                 }
 
-                return true;
+                return await Task.FromResult(true);
             }
             catch
             {
-                return false;
+                return await Task.FromResult(false);
             }
         }
 
+
         private string GenerateJwtToken(User user)
         {
+            if (user == null || string.IsNullOrEmpty(user.Email) || user.Id == null)
+            {
+                throw new ArgumentNullException("User, user email, or user id cannot be null.");
+            }
+
             var tokenHandler = new JwtSecurityTokenHandler();
             var key = Encoding.ASCII.GetBytes(_jwtKey);
             var tokenDescriptor = new SecurityTokenDescriptor
             {
                 Subject = new ClaimsIdentity(new[]
                 {
-                new Claim("id", user.Id.ToString()),
-                new Claim(ClaimTypes.Email, user.Email)
-            }),
+            new Claim("id", user.Id.ToString()),
+            new Claim(ClaimTypes.Email, user.Email)
+        }),
                 Expires = DateTime.UtcNow.AddDays(7),
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
             };

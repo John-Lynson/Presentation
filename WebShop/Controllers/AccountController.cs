@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Presentation.ViewModels;
 using Core.Models;
+using Presentation.Models;
 
 namespace Presentation.Controllers
 {
@@ -11,10 +11,10 @@ namespace Presentation.Controllers
     [Route("[controller]")]
     public class AccountController : ControllerBase
     {
-        private readonly UserManager<ApplicationUser> _userManager;
-        private readonly SignInManager<ApplicationUser> _signInManager;
+        private readonly UserManager<User> _userManager;
+        private readonly SignInManager<User> _signInManager;
 
-        public AccountController(UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager)
+        public AccountController(UserManager<User> userManager, SignInManager<User> signInManager)
         {
             _userManager = userManager;
             _signInManager = signInManager;
@@ -30,7 +30,12 @@ namespace Presentation.Controllers
                 return BadRequest(ModelState);
             }
 
-            var user = new ApplicationUser { UserName = model.Email, Email = model.Email };
+            if (model.Password == null)
+            {
+                return BadRequest("Vul een wachtwoord in");
+            }
+
+            var user = new User { UserName = model.Email, Email = model.Email };
 
             var result = await _userManager.CreateAsync(user, model.Password);
 
@@ -43,6 +48,7 @@ namespace Presentation.Controllers
 
             return Ok();
         }
+
 
         [HttpPost]
         [AllowAnonymous]

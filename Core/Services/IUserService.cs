@@ -15,6 +15,6 @@ namespace Core.Services
         Task<IEnumerable<User>> GetAllUsersAsync();
         Task<bool> CreateUserAsync(User user);
         Task<bool> UpdateUserAsync(User user);
-        Task<bool> DeleteUserAsync(string id); // Veranderd van int naar string voor consistentie
+        Task<bool> DeleteUserAsync(string id); 
     }
 }

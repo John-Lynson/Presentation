@@ -16,11 +16,10 @@ namespace Core.Models
         public decimal Price { get; private set; }
         public string? Category { get; private set; }
 
-        private Product() { } // EF Core needs this
+        private Product() { }
 
-        private Product(int id, string name, string description, string imageUrl, decimal price, string category)
+        private Product(string name, string? description, string? imageUrl, decimal price, string? category)
         {
-            Id = id;
             Name = name;
             Description = description;
             ImageUrl = imageUrl;
@@ -30,18 +29,11 @@ namespace Core.Models
 
         public class Builder
         {
-            private int _id;
-            private string _name;
-            private string _description;
-            private string _imageUrl;
-            private decimal _price;
-            private string _category;
-
-            public Builder WithId(int id)
-            {
-                _id = id;
-                return this;
-            }
+            private string? _name;
+            private string? _description;
+            private string? _imageUrl;
+            private decimal? _price;
+            private string? _category;
 
             public Builder WithName(string name)
             {
@@ -49,13 +41,13 @@ namespace Core.Models
                 return this;
             }
 
-            public Builder WithDescription(string description)
+            public Builder WithDescription(string? description)
             {
                 _description = description;
                 return this;
             }
 
-            public Builder WithImageUrl(string imageUrl)
+            public Builder WithImageUrl(string? imageUrl)
             {
                 _imageUrl = imageUrl;
                 return this;
@@ -67,7 +59,7 @@ namespace Core.Models
                 return this;
             }
 
-            public Builder WithCategory(string category)
+            public Builder WithCategory(string? category)
             {
                 _category = category;
                 return this;
@@ -75,9 +67,12 @@ namespace Core.Models
 
             public Product Build()
             {
-                return new Product(_id, _name, _description, _imageUrl, _price, _category);
+                if (_name == null || _price == null)
+                {
+                    throw new InvalidOperationException("Name and price must be set.");
+                }
+                return new Product(_name, _description, _imageUrl, _price.Value, _category);
             }
         }
     }
 }
-
