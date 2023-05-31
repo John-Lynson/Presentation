@@ -23,7 +23,7 @@ namespace Tests
         public async Task GetCartAsync_ShouldReturnCart_WhenExists()
         {
             var testCartId = "testCartId";
-            var testCart = new Cart { CartId = testCartId };
+            var testCart = new Cart.Builder().WithCartId(testCartId).Build();
             _cartRepositoryMock.Setup(repo => repo.GetCartAsync(testCartId)).ReturnsAsync(testCart);
 
             var result = await _cartService.GetCartAsync(testCartId);
@@ -31,6 +31,7 @@ namespace Tests
             Assert.Equal(testCart, result);
             _cartRepositoryMock.Verify(repo => repo.GetCartAsync(testCartId), Times.Once());
         }
+
 
         [Fact]
         public async Task AddItemAsync_ShouldCallCorrectMethods()

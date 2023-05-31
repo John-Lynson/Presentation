@@ -25,7 +25,7 @@ namespace DataAccess.Services
             // If the cart does not exist, create a new one
             if (cart == null)
             {
-                cart = new Cart { CartId = cartId };
+                cart = new Cart.Builder().WithCartId(cartId).Build();
                 await _cartRepository.CreateAsync(cart);
             }
 

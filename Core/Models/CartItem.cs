@@ -8,10 +8,11 @@ namespace Core.Models
 {
         public class CartItem
         {
-            public Product Product { get; private set; }
-            public int Quantity { get; private set; }
+        public int Id { get; private set; } 
+        public Product Product { get; private set; }
+        public int Quantity { get; private set; }
 
-            private CartItem() { }
+        private CartItem() { }
 
             public class Builder
             {

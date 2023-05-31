@@ -20,7 +20,7 @@ var connectionString = builder.Configuration.GetConnectionString("DefaultConnect
 
 // Register ApplicationDbContext in the DI container.
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseSqlServer(connectionString));
+    options.UseSqlServer(connectionString, x => x.MigrationsAssembly("DataAccess")));
 
 // Add services to the container.
 // Add services to the container.

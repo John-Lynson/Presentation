@@ -8,7 +8,7 @@ namespace Core.Models
 {
     public class Cart
     {
-        public string CartId { get; set; }
+        public string CartId { get; private set; }
         public List<CartItem> CartItems { get; private set; }
 
         public Cart()
@@ -50,6 +50,25 @@ namespace Core.Models
             if (cartItem != null)
             {
                 CartItems.Remove(cartItem);
+            }
+        }
+        public class Builder
+        {
+            private string _cartId;
+
+            public Builder WithCartId(string cartId)
+            {
+                _cartId = cartId;
+                return this;
+            }
+
+            public Cart Build()
+            {
+                return new Cart
+                {
+                    CartId = _cartId
+                    // Eventueel toewijzen van andere eigenschappen...
+                };
             }
         }
     }

@@ -26,13 +26,10 @@ namespace DataAccess
                 .HasColumnType("decimal(18, 2)")
                 .HasPrecision(18, 2);
 
-            modelBuilder.Entity<IdentityUserLogin<string>>()
-                .Ignore(l => l.UserId)
-                .HasKey(l => new { l.LoginProvider, l.ProviderKey });
+            modelBuilder.Entity<Cart>()
+                .OwnsMany(c => c.CartItems);
 
-            // Voeg hier eventuele andere configuraties toe
-
-            //...
+            // Rest van je code...
         }
     }
 }
