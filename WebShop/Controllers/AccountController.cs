@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Core.Models;
-using Presentation.Models;
+using WebShop.ViewModels;
 
 namespace Presentation.Controllers
 {
@@ -35,9 +35,9 @@ namespace Presentation.Controllers
                 return BadRequest("Vul een wachtwoord in");
             }
 
-            var user = new User { FirstName = model.Email, Email = model.Email };
+            var user = new User(model.Email, model.Email, model.Password, model.FirstName, model.LastName);
 
-            var result = await _userManager.CreateAsync(user, model.Password);
+            var result = await _userManager.CreateAsync(user);
 
             if (!result.Succeeded)
             {

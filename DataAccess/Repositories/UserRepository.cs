@@ -1,7 +1,7 @@
-﻿using System.Data.SqlClient;
+﻿using System.Collections.Generic;
+using System.Data.SqlClient;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
-using System.Collections.Generic;
 using Core.Models;
 using Core.Repositories;
 
@@ -28,11 +28,13 @@ namespace DataAccess.Repositories
 
                 while (await reader.ReadAsync())
                 {
-                    users.Add(new User
-                    {
-                        Id = reader.GetString(0),
-                        // Andere velden...
-                    });
+                    users.Add(new User(
+                        reader.GetString(0), // Id
+                        reader.GetString(1), // Email
+                        reader.GetString(2), // PasswordHash
+                        reader.GetString(3), // FirstName
+                        reader.GetString(4)  // LastName
+                    ));
                 }
             }
 
@@ -53,11 +55,13 @@ namespace DataAccess.Repositories
 
                 if (await reader.ReadAsync())
                 {
-                    user = new User
-                    {
-                        Id = reader.GetString(0),
-                        // Andere velden...
-                    };
+                    user = new User(
+                        reader.GetString(0), // Id
+                        reader.GetString(1), // Email
+                        reader.GetString(2), // PasswordHash
+                        reader.GetString(3), // FirstName
+                        reader.GetString(4)  // LastName
+                    );
                 }
             }
 
@@ -69,10 +73,13 @@ namespace DataAccess.Repositories
             using (SqlConnection connection = new SqlConnection(_connectionString))
             {
                 SqlCommand command = new SqlCommand(
-                    "INSERT INTO Users(Id /* Andere velden... */) VALUES (@id /* Andere waarden... */)",
+                    "INSERT INTO Users(Id, Email, PasswordHash, FirstName, LastName) VALUES (@id, @email, @password, @firstName, @lastName)",
                     connection);
                 command.Parameters.AddWithValue("@id", user.Id);
-                // Andere parameters...
+                command.Parameters.AddWithValue("@email", user.Email);
+                command.Parameters.AddWithValue("@password", user.PasswordHash);
+                command.Parameters.AddWithValue("@firstName", user.FirstName);
+                command.Parameters.AddWithValue("@lastName", user.LastName);
 
                 await connection.OpenAsync();
                 await command.ExecuteNonQueryAsync();
@@ -84,10 +91,13 @@ namespace DataAccess.Repositories
             using (SqlConnection connection = new SqlConnection(_connectionString))
             {
                 SqlCommand command = new SqlCommand(
-                    "UPDATE Users SET Id = @id /* Andere velden... */ WHERE Id = @id",
+                    "UPDATE Users SET Email = @email, PasswordHash = @password, FirstName = @firstName, LastName = @lastName WHERE Id = @id",
                     connection);
                 command.Parameters.AddWithValue("@id", user.Id);
-                // Andere parameters...
+                command.Parameters.AddWithValue("@email", user.Email);
+                command.Parameters.AddWithValue("@password", user.PasswordHash);
+                command.Parameters.AddWithValue("@firstName", user.FirstName);
+                command.Parameters.AddWithValue("@lastName", user.LastName);
 
                 await connection.OpenAsync();
                 await command.ExecuteNonQueryAsync();
@@ -120,11 +130,13 @@ namespace DataAccess.Repositories
 
                 if (await reader.ReadAsync())
                 {
-                    user = new User
-                    {
-                        Id = reader.GetString(0),
-                        // Andere velden...
-                    };
+                    user = new User(
+                        reader.GetString(0), // Id
+                        reader.GetString(1), // Email
+                        reader.GetString(2), // PasswordHash
+                        reader.GetString(3), // FirstName
+                        reader.GetString(4)  // LastName
+                    );
                 }
             }
 

@@ -11,19 +11,21 @@ namespace Core.Models
         public DateTime OrderDate { get; private set; }
         public List<OrderItem> OrderItems { get; private set; }
 
-        // Private constructor for EF Core
         private Order()
         {
+            UserId = string.Empty;
+            User = null!;
+            OrderDate = DateTime.MinValue;
+            OrderItems = new List<OrderItem>();
         }
 
-        // Public constructor for creating orders
-        public Order(int id, string userId, User user, DateTime orderDate, List<OrderItem> orderItems)
+        public Order(int id, string userId, DateTime orderDate) : this()
         {
             Id = id;
             UserId = userId;
-            User = user;
             OrderDate = orderDate;
-            OrderItems = orderItems;
         }
+
+        // Rest van je code...
     }
 }

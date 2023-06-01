@@ -1,4 +1,6 @@
-namespace WebShop.Models
+using System.ComponentModel.DataAnnotations;
+
+namespace WebShop.ViewModels
 {
     public class ErrorViewModel
     {

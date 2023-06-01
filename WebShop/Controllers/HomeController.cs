@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System.Diagnostics;
-using WebShop.Models;
+using WebShop.ViewModels;
 using Core.Services;
 
 namespace WebShop.Controllers

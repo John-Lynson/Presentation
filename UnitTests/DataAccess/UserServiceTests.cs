@@ -18,7 +18,8 @@ public class UserServiceTests
     {
         _mockRepo = new Mock<IUserRepository>();
         _userService = new UserService(_mockRepo.Object);
-        _user = new User { Id = "1", FirstName = "Test User" };
+        _user = new User("1", "Test User", "passwordHash", "Test", "User");
+
     }
 
     [Fact]
@@ -36,4 +37,3 @@ public class UserServiceTests
 
     // Other tests here...
 }
-

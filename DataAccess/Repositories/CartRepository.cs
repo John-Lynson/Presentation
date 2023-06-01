@@ -1,9 +1,8 @@
-﻿using System.Collections.Generic;
-using System.Data.SqlClient;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Configuration;
-using Core.Models;
+﻿using Core.Models;
 using Core.Repositories;
+using Microsoft.Extensions.Configuration;
+using Dapper;
+using System.Data.SqlClient;
 
 namespace DataAccess.Repositories
 {
@@ -18,28 +17,23 @@ namespace DataAccess.Repositories
 
         public async Task<Cart> GetCartAsync(string cartId)
         {
-            Cart cart = null;
-
-            using (SqlConnection connection = new SqlConnection(_connectionString))
+            using (var connection = new SqlConnection(_connectionString))
             {
-                SqlCommand command = new SqlCommand("SELECT * FROM Carts WHERE CartId = @cartId", connection);
-                command.Parameters.AddWithValue("@cartId", cartId);
+                var query = "SELECT * FROM Cart WHERE CartId = @CartId";
+                var parameters = new { CartId = cartId };
+                var cart = await connection.QuerySingleOrDefaultAsync<Cart>(query, parameters);
 
-                await connection.OpenAsync();
-                SqlDataReader reader = await command.ExecuteReaderAsync();
-
-                if (await reader.ReadAsync())
+                if (cart != null)
                 {
-                    cart = new Cart
-                    {
-                        CartId = reader.GetString(0),
-                        CartItems = await GetCartItemsAsync(cartId)
-                    };
+                    var cartItems = await GetCartItemsAsync(cartId);
+                    cart.SetCartItems(cartItems);
                 }
-            }
 
-            return cart;
+                return cart;
+            }
         }
+
+
 
         private async Task<List<CartItem>> GetCartItemsAsync(string cartId)
         {

@@ -7,9 +7,17 @@ namespace Core.Models
         public string CartId { get; private set; }
         public List<CartItem> CartItems { get; private set; }
 
-        public Cart()
+        private Cart(string cartId, List<CartItem> cartItems)
         {
-            CartItems = new List<CartItem>();
+            CartId = cartId;
+            CartItems = cartItems;
         }
+
+        public void SetCartItems(List<CartItem> cartItems)
+        {
+            CartItems = cartItems;
+        }
+
+        // Rest van de klasse...
     }
 }
