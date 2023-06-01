@@ -1,36 +1,20 @@
-﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore;
-using Core.Models;
-using Microsoft.AspNetCore.Identity;
+﻿using System.Data.SqlClient;
+using Microsoft.Extensions.Configuration;
 
 namespace DataAccess
 {
-    public class ApplicationDbContext : IdentityDbContext<User>
+    public class ApplicationDbContext
     {
-        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
-            : base(options)
+        private readonly string _connectionString;
+
+        public ApplicationDbContext(IConfiguration configuration)
         {
+            _connectionString = configuration.GetConnectionString("DefaultConnection");
         }
 
-        public DbSet<Product> Products { get; set; }
-        public DbSet<Order> Orders { get; set; }
-        public DbSet<OrderItem> OrderItems { get; set; }
-        public DbSet<Cart> Carts { get; set; }
-
-        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        public SqlConnection CreateConnection()
         {
-            base.OnModelCreating(modelBuilder);
-
-            modelBuilder.Entity<Product>()
-                .Property(p => p.Price)
-                .HasColumnType("decimal(18, 2)")
-                .HasPrecision(18, 2);
-
-            modelBuilder.Entity<Cart>()
-                .OwnsMany(c => c.CartItems);
-
-            // Rest van je code...
+            return new SqlConnection(_connectionString);
         }
-
     }
 }

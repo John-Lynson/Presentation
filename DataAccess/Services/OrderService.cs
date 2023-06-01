@@ -55,8 +55,6 @@ namespace DataAccess.Services
 
         public async Task<IEnumerable<Order>> GetOrdersByUserAsync(int userId)
         {
-            // Dit is een gesimplificeerde implementatie en werkt mogelijk niet zoals je verwacht.
-            // Je moet ervoor zorgen dat je IOrderRepository.GetOrdersByUserIdAsync methode correct is geïmplementeerd.
             return await _orderRepository.GetOrdersByUserIdAsync(userId);
         }
 
@@ -69,7 +67,6 @@ namespace DataAccess.Services
             }
             catch
             {
-                // Afhankelijk van jouw behoeften, kan je hier specifiekere foutafhandeling toevoegen.
                 return false;
             }
         }

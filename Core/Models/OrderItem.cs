@@ -15,65 +15,18 @@ namespace Core.Models
         public Product Product { get; private set; }
         public int Quantity { get; private set; }
 
+        
         private OrderItem() { }
 
-        public class Builder
+        
+        public OrderItem(int id, int orderId, Order order, int productId, Product product, int quantity)
         {
-            private int id;
-            private int orderId;
-            private Order order;
-            private int productId;
-            private Product product;
-            private int quantity;
-
-            public Builder WithId(int id)
-            {
-                this.id = id;
-                return this;
-            }
-
-            public Builder WithOrderId(int orderId)
-            {
-                this.orderId = orderId;
-                return this;
-            }
-
-            public Builder WithOrder(Order order)
-            {
-                this.order = order;
-                return this;
-            }
-
-            public Builder WithProductId(int productId)
-            {
-                this.productId = productId;
-                return this;
-            }
-
-            public Builder WithProduct(Product product)
-            {
-                this.product = product;
-                return this;
-            }
-
-            public Builder WithQuantity(int quantity)
-            {
-                this.quantity = quantity;
-                return this;
-            }
-
-            public OrderItem Build()
-            {
-                return new OrderItem
-                {
-                    Id = this.id,
-                    OrderId = this.orderId,
-                    Order = this.order,
-                    ProductId = this.productId,
-                    Product = this.product,
-                    Quantity = this.quantity
-                };
-            }
+            Id = id;
+            OrderId = orderId;
+            Order = order;
+            ProductId = productId;
+            Product = product;
+            Quantity = quantity;
         }
     }
 }

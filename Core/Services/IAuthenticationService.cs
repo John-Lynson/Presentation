@@ -6,9 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.IdentityModel.Tokens;
 using Core.Models;
 using Core.Repositories;
-using Microsoft.AspNetCore.Identity;
 using Core.Services;
-using Microsoft.EntityFrameworkCore;
 
     namespace Core.Services
     {

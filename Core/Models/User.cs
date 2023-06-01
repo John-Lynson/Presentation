@@ -1,11 +1,11 @@
-﻿using System;
-using Microsoft.AspNetCore.Identity;
-
-namespace Core.Models
+﻿namespace Core.Models
 {
-    public class User : IdentityUser
+    public class User
     {
-        public string? FirstName { get; set; }
-        public string? LastName { get; set; }
+        public string Id { get; private set; }
+        public string Email { get; private set; }
+        public string PasswordHash { get; private set; }
+        public string FirstName { get; private set; }
+        public string LastName { get; private set; }
     }
 }

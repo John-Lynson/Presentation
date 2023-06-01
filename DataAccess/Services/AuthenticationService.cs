@@ -2,13 +2,11 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
-using System.Threading.Tasks;
 using Microsoft.IdentityModel.Tokens;
 using Core.Models;
 using Core.Repositories;
 using Microsoft.AspNetCore.Identity;
 using Core.Services;
-using Microsoft.EntityFrameworkCore;
 
 namespace DataAccess.Services
 {

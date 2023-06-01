@@ -7,10 +7,9 @@ namespace Core.Repositories
     {
         Task<IEnumerable<Product>> GetAllAsync();
         Task<Product> GetByIdAsync(int id);
-        Task<Product> GetProductAsync(int productId);
-        Task CreateAsync(Product product); // make sure this method is in the interface
+        Task CreateAsync(Product product);
         Task UpdateAsync(Product product);
-        Task DeleteAsync(Product product); // make sure this method is in the interface
+        Task DeleteAsync(Product product); 
         Task<IEnumerable<Product>> GetProductsByCategoryAsync(string category);
     }
 }

@@ -35,7 +35,7 @@ namespace Presentation.Controllers
                 return BadRequest("Vul een wachtwoord in");
             }
 
-            var user = new User { UserName = model.Email, Email = model.Email };
+            var user = new User { FirstName = model.Email, Email = model.Email };
 
             var result = await _userManager.CreateAsync(user, model.Password);
 
