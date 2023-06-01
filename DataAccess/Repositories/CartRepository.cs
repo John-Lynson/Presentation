@@ -2,7 +2,10 @@
 using Core.Repositories;
 using Microsoft.Extensions.Configuration;
 using Dapper;
+using System;
+using System.Collections.Generic;
 using System.Data.SqlClient;
+using System.Threading.Tasks;
 
 namespace DataAccess.Repositories
 {
@@ -17,87 +20,102 @@ namespace DataAccess.Repositories
 
         public async Task<Cart> GetCartAsync(string cartId)
         {
-            using (var connection = new SqlConnection(_connectionString))
+            using var connection = new SqlConnection(_connectionString);
+            var query = "SELECT * FROM Cart WHERE CartId = @CartId";
+            var parameters = new { CartId = cartId };
+            var cart = await connection.QuerySingleOrDefaultAsync<Cart>(query, parameters);
+
+            if (cart != null)
             {
-                var query = "SELECT * FROM Cart WHERE CartId = @CartId";
-                var parameters = new { CartId = cartId };
-                var cart = await connection.QuerySingleOrDefaultAsync<Cart>(query, parameters);
-
-                if (cart != null)
-                {
-                    var cartItems = await GetCartItemsAsync(cartId);
-                    cart.SetCartItems(cartItems);
-                }
-
-                return cart;
+                var cartItems = await GetCartItemsAsync(cartId);
+                cart.SetCartItems(cartItems);
             }
+
+            return cart ?? throw new Exception("Cart not found");
         }
-
-
 
         private async Task<List<CartItem>> GetCartItemsAsync(string cartId)
         {
-            List<CartItem> cartItems = new List<CartItem>();
+            var cartItems = new List<CartItem>();
 
-            using (SqlConnection connection = new SqlConnection(_connectionString))
+            using var connection = new SqlConnection(_connectionString);
+            var query = "SELECT * FROM CartItems WHERE CartId = @CartId";
+            var parameters = new { CartId = cartId };
+
+            using var reader = await connection.ExecuteReaderAsync(query, parameters);
+            while (await reader.ReadAsync())
             {
-                SqlCommand command = new SqlCommand("SELECT * FROM CartItems WHERE CartId = @cartId", connection);
-                command.Parameters.AddWithValue("@cartId", cartId);
-
-                await connection.OpenAsync();
-                SqlDataReader reader = await command.ExecuteReaderAsync();
-
-                while (await reader.ReadAsync())
-                {
-                    CartItem item = new CartItem();
-                    item.SetCartId(reader.GetString(0));
-                    item.SetProduct(await GetProductByIdAsync(reader.GetInt32(1)));
-                    cartItems.Add(item);
-                }
+                var item = new CartItem();
+                item.SetCartId(reader.GetString(reader.GetOrdinal("CartId")));
+                item.SetProduct(await GetProductByIdAsync(reader.GetInt32(reader.GetOrdinal("ProductId"))));
+                cartItems.Add(item);
             }
 
             return cartItems;
         }
 
-
         private async Task<Product> GetProductByIdAsync(int productId)
         {
-            Product product = null;
+            using var connection = new SqlConnection(_connectionString);
+            var query = "SELECT * FROM Products WHERE Id = @ProductId";
+            var parameters = new { ProductId = productId };
 
-            using (SqlConnection connection = new SqlConnection(_connectionString))
+            using var reader = await connection.ExecuteReaderAsync(query, parameters);
+            if (await reader.ReadAsync())
             {
-                SqlCommand command = new SqlCommand("SELECT * FROM Products WHERE Id = @id", connection);
-                command.Parameters.AddWithValue("@id", productId);
-
-                await connection.OpenAsync();
-                SqlDataReader reader = await command.ExecuteReaderAsync();
-
-                if (await reader.ReadAsync())
-                {
-                    product = new Product(
-                        reader.GetInt32(0),
-                        reader.GetString(1),
-                        reader.IsDBNull(2) ? null : reader.GetString(2),
-                        reader.IsDBNull(3) ? null : reader.GetString(3),
-                        reader.GetDecimal(4),
-                        reader.IsDBNull(5) ? null : reader.GetString(5)
-                    );
-                }
+                return new Product(
+                    reader.GetInt32(reader.GetOrdinal("Id")),
+                    reader.GetString(reader.GetOrdinal("Name")),
+                    reader.IsDBNull(reader.GetOrdinal("Description")) ? null : reader.GetString(reader.GetOrdinal("Description")),
+                    reader.IsDBNull(reader.GetOrdinal("Category")) ? null : reader.GetString(reader.GetOrdinal("Category")),
+                    reader.GetDecimal(reader.GetOrdinal("Price")),
+                    reader.IsDBNull(reader.GetOrdinal("ImageUrl")) ? null : reader.GetString(reader.GetOrdinal("ImageUrl"))
+                );
             }
 
-            return product;
+            return null;
         }
 
-        public Task CreateAsync(Cart cart)
+        public async Task CreateAsync(Cart cart)
         {
-            // Implementatie voor het creëren van een nieuwe cart
-            throw new NotImplementedException();
+            using var connection = new SqlConnection(_connectionString);
+            var query = "INSERT INTO Cart (CartId) VALUES (@CartId)";
+            var parameters = new { CartId = cart.CartId };
+            await connection.ExecuteAsync(query, parameters);
+
+            foreach (var cartItem in cart.CartItems)
+            {
+                await AddCartItemAsync(connection, cart.CartId, cartItem);
+            }
         }
 
-        public Task UpdateAsync(Cart cart)
+        public async Task UpdateAsync(Cart cart)
         {
-            // Implementatie voor het bijwerken van een bestaande cart
-            throw new NotImplementedException();
+            using var connection = new SqlConnection(_connectionString);
+            var query = "UPDATE Cart SET CartId = @CartId WHERE CartId = @OldCartId";
+            var parameters = new { CartId = cart.CartId, OldCartId = cart.CartId };
+            await connection.ExecuteAsync(query, parameters);
+
+            await RemoveAllCartItemsAsync(connection, cart.CartId);
+
+            foreach (var cartItem in cart.CartItems)
+            {
+                await AddCartItemAsync(connection, cart.CartId, cartItem);
+            }
+        }
+
+        private static async Task AddCartItemAsync(SqlConnection connection, string cartId, CartItem cartItem)
+        {
+            var query = "INSERT INTO CartItems (CartId, ProductId) VALUES (@CartId, @ProductId)";
+            var parameters = new { CartId = cartId, ProductId = cartItem.Product.Id };
+            await connection.ExecuteAsync(query, parameters);
+        }
+
+        private static async Task RemoveAllCartItemsAsync(SqlConnection connection, string cartId)
+        {
+            var query = "DELETE FROM CartItems WHERE CartId = @CartId";
+            var parameters = new { CartId = cartId };
+            await connection.ExecuteAsync(query, parameters);
         }
     }
 }

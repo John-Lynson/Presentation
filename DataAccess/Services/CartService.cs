@@ -21,7 +21,23 @@ namespace DataAccess.Services
 
         public async Task RemoveItemAsync(string cartId, Product product)
         {
-            // Implementatie voor het verwijderen van een item uit de cart
+            // Haal de huidige cart op
+            var cart = await _cartRepository.GetCartAsync(cartId);
+
+            if (cart != null)
+            {
+                // Zoek het item dat overeenkomt met het product in de cart
+                var itemToRemove = cart.CartItems.FirstOrDefault(item => item.Product.Id == product.Id);
+
+                if (itemToRemove != null)
+                {
+                    // Verwijder het item uit de cart
+                    cart.CartItems.Remove(itemToRemove);
+
+                    // Update de cart in de repository
+                    await _cartRepository.UpdateAsync(cart);
+                }
+            }
         }
 
         public async Task<Cart> GetCartAsync(string cartId)
