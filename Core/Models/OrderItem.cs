@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Core.Models
 {
@@ -15,10 +11,8 @@ namespace Core.Models
         public Product Product { get; private set; }
         public int Quantity { get; private set; }
 
-        
         private OrderItem() { }
 
-        
         public OrderItem(int id, int orderId, Order order, int productId, Product product, int quantity)
         {
             Id = id;
