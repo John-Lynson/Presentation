@@ -1,0 +1,35 @@
+﻿CREATE TABLE Users (
+    Id NVARCHAR(100) PRIMARY KEY,
+    Email NVARCHAR(100) NOT NULL,
+    PasswordHash NVARCHAR(100) NOT NULL,
+    FirstName NVARCHAR(100) NOT NULL,
+    LastName NVARCHAR(100) NOT NULL
+);
+
+CREATE TABLE Orders (
+    Id INT PRIMARY KEY IDENTITY(1,1),
+    UserId NVARCHAR(100) NOT NULL,
+    OrderDate DATETIME NOT NULL,
+    FOREIGN KEY (UserId) REFERENCES Users(Id)
+);
+
+CREATE TABLE Cart (
+    CartId NVARCHAR(100) PRIMARY KEY
+);
+
+CREATE TABLE OrderItems (
+    Id INT IDENTITY(1,1) PRIMARY KEY,
+    OrderId INT FOREIGN KEY REFERENCES Orders(Id),
+    ProductId INT FOREIGN KEY REFERENCES Products(Id),
+    Quantity INT
+);
+
+CREATE TABLE Products (
+    Id INT PRIMARY KEY,
+    Name NVARCHAR(100),
+    Description NVARCHAR(1000),
+    Category NVARCHAR(100),
+    Price DECIMAL(18, 2),
+    ImageUrl NVARCHAR(1000)
+);
+

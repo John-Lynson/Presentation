@@ -1,28 +1,31 @@
-﻿@model IEnumerable<Core.Models.Product>
+﻿@model IEnumerable<Product> //!--Update this according to your project namespace and model-->
 
-@{
-    ViewData["Title"] = "Home Page";
-}
-
-<h1 class="text-center display-4">Welcome</h1>
-<div class="text-center">
-    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-</div>
-
-<div class="container">
+<div class="container mt-4">
+    <!-- Welcome Text Block -->
     <div class="row">
-        @foreach (var product in Model)
+        <div class="col">
+            <h1 class="text-center">Welkom bij onze webshop!</h1>
+            <p class="text-center">
+                Hier vind je een breed scala aan producten speciaal geselecteerd voor jouw behoeften.
+            </p>
+        </div>
+    </div>
+
+    <!-- Product Display -->
+    <div class="row">
+        @foreach(var product in Model.Take(4)) 
         {
-            <div class="col-sm-4">
+            <div class="col-md-6 my-3">
                 <div class="card">
+                    <img src="@product.ImageUrl" class="card-img-top" alt="@product.Name" />
                     <div class="card-body">
                         <h5 class="card-title">@product.Name</h5>
                         <p class="card-text">@product.Description</p>
-                        <p class="card-text"><strong>@product.Price.ToString("C")</strong></p>
-                        <a href="#" class="btn btn-primary">Add to cart</a>
+                        <a href="@Url.Action("Details", "Product", new { id = product.Id })" class="btn btn-primary">Bekijk Product</a>
                     </div>
                 </div>
             </div>
         }
     </div>
 </div>
+

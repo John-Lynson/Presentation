@@ -1,5 +1,5 @@
 ﻿using Core.Models;
-using Core.Services; 
+using Core.Services;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
 
@@ -7,7 +7,7 @@ namespace WebShop.Controllers
 {
     public class ProductController : Controller
     {
-        private readonly IProductService _productService; 
+        private readonly IProductService _productService;
 
         public ProductController(IProductService productService)
         {
@@ -26,6 +26,11 @@ namespace WebShop.Controllers
             return View(product);
         }
 
+        public IActionResult Create()
+        {
+            return View();
+        }
+
         [HttpPost]
         public async Task<IActionResult> Create(Product product)
         {
@@ -34,6 +39,12 @@ namespace WebShop.Controllers
                 await _productService.CreateAsync(product);
                 return RedirectToAction(nameof(Index));
             }
+            return View(product);
+        }
+
+        public async Task<IActionResult> Edit(int id)
+        {
+            var product = await _productService.GetByIdAsync(id);
             return View(product);
         }
 
@@ -48,7 +59,7 @@ namespace WebShop.Controllers
             return View(product);
         }
 
-        [HttpDelete("{id}")]
+        [HttpPost]
         public async Task<IActionResult> DeleteProduct(int id)
         {
             var product = await _productService.GetByIdAsync(id);
@@ -57,8 +68,8 @@ namespace WebShop.Controllers
                 return NotFound();
             }
 
-            await _productService.DeleteAsync(product);  // Hier moet een Product-object worden doorgegeven.
-            return NoContent();
+            await _productService.DeleteAsync(product);
+            return RedirectToAction(nameof(Index));
         }
     }
 }

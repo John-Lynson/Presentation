@@ -39,20 +39,27 @@ namespace DataAccess.Repositories
             var cartItems = new List<CartItem>();
 
             using var connection = new SqlConnection(_connectionString);
-            var query = "SELECT * FROM CartItems WHERE CartId = @CartId";
+            var query = @"SELECT CartItems.*, Products.* 
+                  FROM CartItems 
+                  INNER JOIN Products ON CartItems.ProductId = Products.Id 
+                  WHERE CartItems.CartId = @CartId";
             var parameters = new { CartId = cartId };
 
-            using var reader = await connection.ExecuteReaderAsync(query, parameters);
-            while (await reader.ReadAsync())
-            {
-                var item = new CartItem();
-                item.SetCartId(reader.GetString(reader.GetOrdinal("CartId")));
-                item.SetProduct(await GetProductByIdAsync(reader.GetInt32(reader.GetOrdinal("ProductId"))));
-                cartItems.Add(item);
-            }
+            var result = await connection.QueryAsync<CartItem, Product, CartItem>(
+                query,
+                (cartItem, product) =>
+                {
+                    cartItem.SetProduct(product);
+                    return cartItem;
+                },
+                parameters,
+                splitOn: "Id");
+
+            cartItems = result.ToList();
 
             return cartItems;
         }
+
 
         private async Task<Product> GetProductByIdAsync(int productId)
         {

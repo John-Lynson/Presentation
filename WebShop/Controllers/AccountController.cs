@@ -1,8 +1,9 @@
 ﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Core.Models;
+using DataAccess.Repositories;
 using WebShop.ViewModels;
+using Core.Repositories;
 
 namespace Presentation.Controllers
 {
@@ -11,19 +12,17 @@ namespace Presentation.Controllers
     [Route("[controller]")]
     public class AccountController : ControllerBase
     {
-        private readonly UserManager<User> _userManager;
-        private readonly SignInManager<User> _signInManager;
+        private readonly IUserRepository _userRepository;
 
-        public AccountController(UserManager<User> userManager, SignInManager<User> signInManager)
+        public AccountController(IUserRepository userRepository)
         {
-            _userManager = userManager;
-            _signInManager = signInManager;
+            _userRepository = userRepository;
         }
 
         [HttpPost]
         [AllowAnonymous]
         [Route("register")]
-        public async Task<IActionResult> Register([FromBody] RegisterViewModel model)
+        public IActionResult Register([FromBody] RegisterViewModel model)
         {
             if (!ModelState.IsValid)
             {
@@ -36,52 +35,47 @@ namespace Presentation.Controllers
             }
 
             var user = new User(
-                id: Guid.NewGuid().ToString(), 
+                id: Guid.NewGuid().ToString(),
                 email: model.Email ?? string.Empty,
                 passwordHash: model.Password,
                 firstName: model.FirstName ?? string.Empty,
                 lastName: model.LastName ?? string.Empty
             );
 
-            var result = await _userManager.CreateAsync(user);
+            // Voeg de logica toe om de gebruiker toe te voegen aan de database met behulp van ADO.NET
 
-            if (!result.Succeeded)
-            {
-                return BadRequest(result.Errors);
-            }
-
-            await _signInManager.SignInAsync(user, isPersistent: false);
+            _userRepository.CreateAsync(user);
 
             return Ok();
         }
 
-
-
         [HttpPost]
         [AllowAnonymous]
         [Route("login")]
-        public async Task<IActionResult> Login([FromBody] LoginViewModel model)
+        public IActionResult Login([FromBody] LoginViewModel model)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
 
-            var result = await _signInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, lockoutOnFailure: false);
+            var user = _userRepository.GetUserByEmailAsync(model.Email);
 
-            if (!result.Succeeded)
+            if (user == null || user.PasswordHash != model.Password)
             {
                 return Unauthorized();
             }
+
+            // Voeg de logica toe om de gebruiker in te loggen
 
             return Ok();
         }
 
         [HttpPost]
         [Route("logout")]
-        public async Task<IActionResult> Logout()
+        public IActionResult Logout()
         {
-            await _signInManager.SignOutAsync();
+            // Voeg de logica toe om de gebruiker uit te loggen
 
             return Ok();
         }
