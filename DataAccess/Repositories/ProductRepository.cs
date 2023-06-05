@@ -22,25 +22,33 @@ namespace DataAccess.Repositories
 
             using (SqlConnection connection = new SqlConnection(_connectionString))
             {
-                SqlCommand command = new SqlCommand("SELECT * FROM Products", connection);
-                await connection.OpenAsync();
-                SqlDataReader reader = await command.ExecuteReaderAsync();
-
-                while (await reader.ReadAsync())
+                try
                 {
-                    products.Add(new Product(
-                        reader.GetInt32(0),
-                        reader.GetString(1),
-                        reader.IsDBNull(2) ? null : reader.GetString(2),
-                        reader.IsDBNull(3) ? null : reader.GetString(3),
-                        reader.GetDecimal(4),
-                        reader.IsDBNull(5) ? null : reader.GetString(5)
-                    ));
+                    SqlCommand command = new SqlCommand("SELECT * FROM Products", connection);
+                    await connection.OpenAsync();
+                    SqlDataReader reader = await command.ExecuteReaderAsync();
+
+                    while (await reader.ReadAsync())
+                    {
+                        products.Add(new Product(
+                            reader.GetInt32(0),
+                            reader.GetString(1),
+                            reader.IsDBNull(2) ? null : reader.GetString(2),
+                            reader.IsDBNull(3) ? null : reader.GetString(3),
+                            reader.GetDecimal(4),
+                            reader.IsDBNull(5) ? null : reader.GetString(5)
+                        ));
+                    }
+                }
+                catch (SqlException ex)
+                {
+                    throw new Exception("Er is een fout opgetreden bij het ophalen van de producten.", ex);
                 }
             }
 
             return products;
         }
+
 
         public async Task<Product> GetByIdAsync(int id)
         {

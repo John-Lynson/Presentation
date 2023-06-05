@@ -35,6 +35,7 @@ public class HomeController : Controller
         return View(product);
     }
 
+
     public IActionResult Privacy()
     {
         return View();

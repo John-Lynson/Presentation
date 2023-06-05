@@ -23,6 +23,10 @@ namespace WebShop.Controllers
         public async Task<IActionResult> Details(int id)
         {
             var product = await _productService.GetByIdAsync(id);
+            if (product == null)
+            {
+                return NotFound();
+            }
             return View(product);
         }
 
@@ -45,8 +49,13 @@ namespace WebShop.Controllers
         public async Task<IActionResult> Edit(int id)
         {
             var product = await _productService.GetByIdAsync(id);
+            if (product == null)
+            {
+                return NotFound();
+            }
             return View(product);
         }
+
 
         [HttpPost]
         public async Task<IActionResult> Edit(Product product)
