@@ -1,18 +1,11 @@
 ﻿@model Core.Models.Product
 
-<form asp-action="Create">
-    <div class="form-group">
-        <label asp-for="Name"></label>
-        <input asp-for="Name" class="form-control" />
-    </div>
-    <div class="form-group">
-        <label asp-for="Description"></label>
-        <input asp-for="Description" class="form-control" />
-    </div>
-    <div class="form-group">
-        <label asp-for="Price"></label>
-        <input asp-for="Price" class="form-control" />
-    </div>
-    <!-- Herhaal dit voor elke andere eigenschap van Product -->
-    <button type="submit" class="btn btn-primary">Opslaan</button>
-</form>
+<h2>@Model.Name</h2>
+
+<p>@Model.Description</p>
+
+<p>Price: @Model.Price</p>
+
+<img src="@Model.ImageUrl" alt="@Model.Name" />
+
+<button>Add to Cart</button>

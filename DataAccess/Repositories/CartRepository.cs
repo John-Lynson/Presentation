@@ -30,9 +30,15 @@ namespace DataAccess.Repositories
                 var cartItems = await GetCartItemsAsync(cartId);
                 cart.SetCartItems(cartItems);
             }
+            else
+            {
+                // No cart found for the provided CartId, create a new empty one
+                cart = new Cart(cartId, new List<CartItem>());
+            }
 
-            return cart ?? throw new Exception("Cart not found");
+            return cart;
         }
+
 
         private async Task<List<CartItem>> GetCartItemsAsync(string cartId)
         {
@@ -99,9 +105,6 @@ namespace DataAccess.Repositories
         public async Task UpdateAsync(Cart cart)
         {
             using var connection = new SqlConnection(_connectionString);
-            var query = "UPDATE Cart SET CartId = @CartId WHERE CartId = @OldCartId";
-            var parameters = new { CartId = cart.CartId, OldCartId = cart.CartId };
-            await connection.ExecuteAsync(query, parameters);
 
             await RemoveAllCartItemsAsync(connection, cart.CartId);
 
@@ -111,14 +114,14 @@ namespace DataAccess.Repositories
             }
         }
 
-        private static async Task AddCartItemAsync(SqlConnection connection, string cartId, CartItem cartItem)
+        public static async Task AddCartItemAsync(SqlConnection connection, string cartId, CartItem cartItem)
         {
             var query = "INSERT INTO CartItems (CartId, ProductId) VALUES (@CartId, @ProductId)";
             var parameters = new { CartId = cartId, ProductId = cartItem.Product.Id };
             await connection.ExecuteAsync(query, parameters);
         }
 
-        private static async Task RemoveAllCartItemsAsync(SqlConnection connection, string cartId)
+        public static async Task RemoveAllCartItemsAsync(SqlConnection connection, string cartId)
         {
             var query = "DELETE FROM CartItems WHERE CartId = @CartId";
             var parameters = new { CartId = cartId };

@@ -4,6 +4,7 @@
     {
         public string CartId { get; private set; }
         public Product Product { get; private set; }
+        public int Quantity { get; private set; }  // Added Quantity property
 
         public void SetCartId(string cartId)
         {
@@ -15,6 +16,12 @@
             Product = product;
         }
 
+        public void SetQuantity(int quantity)  // Added method to set Quantity
+        {
+            Quantity = quantity;
+        }
+
         // Rest van de klasse...
     }
 }
+

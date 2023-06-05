@@ -1,5 +1,34 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
+﻿@model List<Core.Models.CartItem>
+
 @{
+    ViewData["Title"] = "Winkelwagen";
 }
+
+<h1>Winkelwagen</h1>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Productnaam</th>
+            <th>Prijs</th>
+            <th>Hoeveelheid</th>
+            <th>Totaal</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.Product.Name</td> <!-- You may need to adjust this depending on your model structure -->
+                <td>@item.Product.Price.ToString("C")</td> <!-- Adjust this too -->
+                <td>@item.Quantity</td>
+                <td>@(item.Product.Price * item.Quantity).ToString("C")</td> <!-- Calculate line total -->
+            </tr>
+        }
+    </tbody>
+</table>
+
+<div class="text-right">
+    <h3>Totaal: @Model.Sum(item => item.Product.Price * item.Quantity).ToString("C")</h3> <!-- Calculate grand total -->
+    <button class="btn btn-primary">Afrekenen</button>
+</div>

@@ -4,6 +4,7 @@ using Core.Models;
 using DataAccess.Repositories;
 using WebShop.ViewModels;
 using Core.Repositories;
+using Core.Services;
 
 namespace Presentation.Controllers
 {
@@ -42,7 +43,6 @@ namespace Presentation.Controllers
                 lastName: model.LastName ?? string.Empty
             );
 
-            // Voeg de logica toe om de gebruiker toe te voegen aan de database met behulp van ADO.NET
 
             _userRepository.CreateAsync(user);
 
@@ -52,21 +52,17 @@ namespace Presentation.Controllers
         [HttpPost]
         [AllowAnonymous]
         [Route("login")]
-        public IActionResult Login([FromBody] LoginViewModel model)
+        public async Task<IActionResult> Login([FromBody] LoginViewModel model)
         {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
 
-            var user = _userRepository.GetUserByEmailAsync(model.Email);
+            var user = await _userRepository.GetUserByEmailAsync(model.Email);
 
             if (user == null || user.PasswordHash != model.Password)
             {
                 return Unauthorized();
             }
 
-            // Voeg de logica toe om de gebruiker in te loggen
+            // ... Rest van de code
 
             return Ok();
         }

@@ -6,11 +6,11 @@ namespace Core.Models
     {
         public string CartId { get; private set; }
         public List<CartItem> CartItems { get; private set; }
-
-        private Cart(string cartId, List<CartItem> cartItems)
+     
+        public Cart(string cartId, List<CartItem> cartItems)
         {
             CartId = cartId;
-            CartItems = cartItems;
+            CartItems = cartItems ?? new List<CartItem>();
         }
 
         public void SetCartItems(List<CartItem> cartItems)

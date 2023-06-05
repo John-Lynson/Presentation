@@ -9,7 +9,7 @@ namespace Core.Services
     public interface IPasswordHasher
     {
         string HashPassword(string password);
-        bool VerifyPassword(string hashedPassword, string providedPassword);
+        bool VerifyHashedPassword(string hashedPassword, string providedPassword);
     }
 }
 

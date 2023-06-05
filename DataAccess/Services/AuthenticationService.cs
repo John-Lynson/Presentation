@@ -5,18 +5,18 @@ using System.Text;
 using Microsoft.IdentityModel.Tokens;
 using Core.Models;
 using Core.Repositories;
-using Microsoft.AspNetCore.Identity;
 using Core.Services;
+using DataAccess.Services;
 
 namespace DataAccess.Services
 {
     public class AuthenticationService : IAuthenticationService
     {
         private readonly IUserRepository _userRepository;
-        private readonly IPasswordHasher<User> _passwordHasher;
+        private readonly IPasswordHasher _passwordHasher;
         private readonly string _jwtKey;
 
-        public AuthenticationService(IUserRepository userRepository, IPasswordHasher<User> passwordHasher, string jwtKey)
+        public AuthenticationService(IUserRepository userRepository, IPasswordHasher passwordHasher, string jwtKey)
         {
             _userRepository = userRepository;
             _passwordHasher = passwordHasher;
@@ -25,7 +25,7 @@ namespace DataAccess.Services
 
         public async Task<AuthenticationResult> RegisterAsync(User user, string password)
         {
-            user.PasswordHash = _passwordHasher.HashPassword(user, password);
+            user.PasswordHash = _passwordHasher.HashPassword(password);
             await _userRepository.CreateAsync(user);
             string token = GenerateJwtToken(user);
             return new AuthenticationResult { IsAuthenticated = true, Token = token };
@@ -34,7 +34,8 @@ namespace DataAccess.Services
         public async Task<AuthenticationResult> LoginAsync(string email, string password)
         {
             User user = await _userRepository.GetUserByEmailAsync(email);
-            if (user == null || string.IsNullOrEmpty(user.PasswordHash) || !_passwordHasher.VerifyHashedPassword(user, user.PasswordHash, password).Equals(PasswordVerificationResult.Success))
+            if (user == null || string.IsNullOrEmpty(user.PasswordHash) || !_passwordHasher.VerifyHashedPassword(user.PasswordHash, password))
+
             {
                 return new AuthenticationResult { IsAuthenticated = false };
             }
@@ -45,7 +46,8 @@ namespace DataAccess.Services
         public async Task<AuthenticationResult> AuthenticateAsync(AuthenticateRequest model)
         {
             User user = await _userRepository.GetUserByEmailAsync(model.Email);
-            if (user == null || string.IsNullOrEmpty(user.PasswordHash) || !_passwordHasher.VerifyHashedPassword(user, user.PasswordHash, model.Password).Equals(PasswordVerificationResult.Success))
+            if (user == null || string.IsNullOrEmpty(user.PasswordHash) || !_passwordHasher.VerifyHashedPassword(user.PasswordHash, model.Password))
+
             {
                 return new AuthenticationResult { IsAuthenticated = false };
             }
